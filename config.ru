@@ -1,6 +1,5 @@
 require 'nginx_omniauth_adapter'
-
-
+require 'omniauth-github'
 
 module HeaderInfoInjector
   def header(title, header_info = '')
