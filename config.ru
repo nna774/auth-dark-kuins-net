@@ -35,4 +35,14 @@ run NginxOmniauthAdapter.app(
       policy_proc: proc {
         (current_user_data[:gh_teams] || []).any? { |team| GH_TEAMS.include?(team) }
       },
+      on_login_proc: proc {
+        auth = env['omniauth.auth']
+        if GH_TEAMS
+          api_host = 'https://api.github.com'
+          current_user_data[:gh_teams] = open("#{api_host}/user/teams", 'Authorization' => "token #{auth['credentials']['token']}") { |io|
+            JSON.parse(io.read).map {|_| "#{_['organization']['login']}/#{_['slug']}" }.select { |team| GH_TEAMS.include?(team) }
+          }
+        end
+        true
+      },
     )
