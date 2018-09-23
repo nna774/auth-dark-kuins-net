@@ -16,7 +16,13 @@ use Rack::Session::Cookie,
     secure: true,
     expire_after: 60 * 60 * 24 * 30
 
-use OmniAuth::Strategies::GitHub, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET']
+use OmniAuth::Builder do
+  provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], scope: 'read:org'
+end
+
+GH_TEAMS = %w(
+dark-kuins-net/all
+)
 
 run NginxOmniauthAdapter.app(
       providers: %i(github),
@@ -26,4 +32,7 @@ run NginxOmniauthAdapter.app(
       allowed_app_callback_url: %r(\Ahttps?://[^/]+\.(dark-kuins\.net|nna774\.net)/),
       app_refresh_interval: 60 * 60 * 24 * 2,
       adapter_refresh_interval: 60 * 60 * 24 * 7,
+      policy_proc: proc {
+        (current_user_data[:gh_teams] || []).any? { |team| GH_TEAMS.include?(team) }
+      },
     )
