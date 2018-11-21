@@ -1,6 +1,9 @@
 require 'nginx_omniauth_adapter'
 require 'omniauth-github'
 require 'open-uri'
+require 'rack/ssl-enforcer'
+
+use Rack::SslEnforcer
 
 module HeaderInfoInjector
   def header(title, header_info = '')
