@@ -5,13 +5,6 @@ require 'rack/ssl-enforcer'
 
 use Rack::SslEnforcer
 
-module HeaderInfoInjector
-  def header(title, header_info = '')
-    header_info << '<meta name="viewport" content="width=device-width,initial-scale=1.0">'
-    super(title, header_info)
-  end
-end
-
 OmniAuth::Form.prepend(HeaderInfoInjector)
 
 use Rack::Session::Cookie,
