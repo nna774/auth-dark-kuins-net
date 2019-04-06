@@ -5,8 +5,6 @@ require 'rack/ssl-enforcer'
 
 use Rack::SslEnforcer
 
-OmniAuth::Form.prepend(HeaderInfoInjector)
-
 use Rack::Session::Cookie,
     key: ENV['RACK_SESSION_KEY'],
     secret: ENV['RACK_SESSION_SECRET'],
