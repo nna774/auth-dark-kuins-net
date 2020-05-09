@@ -2,9 +2,7 @@
 
 source 'https://rubygems.org'
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
-
-gem 'thin'
+gem 'puma'
 gem 'rack-ssl-enforcer'
 gem 'nginx_omniauth_adapter'
 gem 'omniauth'
