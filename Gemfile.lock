@@ -13,7 +13,7 @@ GEM
     nginx_omniauth_adapter (1.0.0)
       omniauth
       sinatra
-    nio4r (2.5.2)
+    nio4r (2.5.7)
     oauth2 (1.4.4)
       faraday (>= 0.8, < 2.0)
       jwt (>= 1.0, < 3.0)
@@ -29,7 +29,7 @@ GEM
     omniauth-oauth2 (1.6.0)
       oauth2 (~> 1.1)
       omniauth (~> 1.9)
-    puma (4.3.5)
+    puma (4.3.8)
       nio4r (~> 2.0)
     rack (2.2.3)
     rack-protection (2.0.8.1)
