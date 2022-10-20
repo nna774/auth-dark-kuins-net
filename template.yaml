@@ -3,7 +3,7 @@ Transform: AWS::Serverless-2016-10-31
 Resources:
   ApiGateway:
     Name: auth-dark-kuins-net
-    Type: AWS::Serverless::Api
+    Type: AWS::Serverless::HttpApi
     Properties:
       StageName: Prod
       Domain:
@@ -18,17 +18,9 @@ Resources:
       Timeout: 30
       Events:
         Root:
-          Type: Api
+          Type: HttpApi
           Properties:
-            RestApiId: !Ref ApiGateway
-            Path: /
-            Method: any
-        CatchAll:
-          Type: Api
-          Properties:
-            RestApiId: !Ref ApiGateway
-            Path: /{proxy+}
-            Method: any
+            ApiId: !Ref ApiGateway
 
 Outputs:
   API:
