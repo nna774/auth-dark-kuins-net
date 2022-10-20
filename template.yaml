@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  ApiGateway:
+    Name: auth-dark-kuins-net
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Domain:
+        CertificateArn: arn:aws:acm:ap-northeast-1:486414336274:certificate/5b205c4d-aec3-4ee1-b5e5-3b338026dcf4 # *.dark-kuins.neet
+        DomainName: auth.dark-kuins.net
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: main.Main.handle
+      Runtime: ruby2.7
+      FunctionName: auth-dark-kuins-net
+      Timeout: 30
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /
+            Method: any
+        CatchAll:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGateway
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  API:
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
