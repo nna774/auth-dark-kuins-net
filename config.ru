@@ -21,7 +21,7 @@ GH_TEAMS = %w(
   dark-kuins-net/all
 )
 
-run NginxOmniauthAdapter.app(
+app = NginxOmniauthAdapter.app(
   providers: %i(github),
   key: ENV['RACK_SESSION_KEY'],
   secret: ENV['RACK_SESSION_SECRET'], # `openssl rand -base64 32`
@@ -43,3 +43,11 @@ run NginxOmniauthAdapter.app(
     true
   },
 )
+
+run ->(env) {
+  if env['PATH_INFO'] == '/'
+    [200, {}, ['o-su!']]
+  else
+    app.call(env)
+  end
+}
