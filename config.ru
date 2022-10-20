@@ -3,7 +3,9 @@ require 'omniauth-github'
 require 'open-uri'
 require 'rack/ssl-enforcer'
 
-use Rack::SslEnforcer
+if ENV['RACK_ENV'] != 'development'
+  use Rack::SslEnforcer
+end
 
 use Rack::Session::Cookie,
   key: ENV['RACK_SESSION_KEY'],
