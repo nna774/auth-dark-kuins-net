@@ -10,8 +10,6 @@ GEM
     hashie (5.0.0)
     jwt (2.5.0)
     multi_xml (0.6.0)
-    mustermann (3.0.0)
-      ruby2_keywords (~> 0.0.1)
     nginx_omniauth_adapter (1.0.0)
       omniauth
       sinatra
@@ -22,7 +20,7 @@ GEM
       rack (>= 1.2, < 4)
       snaky_hash (~> 2.0)
       version_gem (~> 1.1)
-    omniauth (2.1.0)
+    omniauth (2.1.1)
       hashie (>= 3.4.6)
       rack (>= 2.2.3)
       rack-protection
@@ -32,20 +30,16 @@ GEM
     omniauth-oauth2 (1.8.0)
       oauth2 (>= 1.4, < 3)
       omniauth (~> 2.0)
-    rack (2.2.4)
+    rack (3.0.4.2)
     rack-protection (3.0.2)
       rack
     rack-ssl-enforcer (0.2.9)
     ruby2_keywords (0.0.5)
-    sinatra (3.0.2)
-      mustermann (~> 3.0)
-      rack (~> 2.2, >= 2.2.4)
-      rack-protection (= 3.0.2)
-      tilt (~> 2.0)
+    sinatra (1.0)
+      rack (>= 1.0)
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
-    tilt (2.0.11)
     version_gem (1.1.1)
 
 PLATFORMS
