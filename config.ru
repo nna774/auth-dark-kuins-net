@@ -12,8 +12,12 @@ end
 OmniAuth.config.allowed_request_methods = %i(get)
 OmniAuth.config.silence_get_warning = true
 
+# RACK_SESSION_KEY は cookie の名前になる。rack は cookie 名をエスケープして返すのに、
+# 読み戻す時は名前をアンエスケープしないので、+ / = などを含むとセッションが読めなくなる。
+SESSION_KEY = ENV['RACK_SESSION_KEY'].to_s.delete('^A-Za-z0-9_-')
+
 use Rack::Session::Cookie,
-  key: ENV['RACK_SESSION_KEY'],
+  key: SESSION_KEY,
   secret: ENV['RACK_SESSION_SECRET'],
   secure: true,
   expire_after: 60 * 60 * 24 * 30
@@ -28,7 +32,7 @@ GH_TEAMS = %w(
 
 app = NginxOmniauthAdapter.app(
   providers: %i(github),
-  key: ENV['RACK_SESSION_KEY'],
+  key: SESSION_KEY,
   secret: ENV['RACK_SESSION_SECRET'], # `openssl rand -base64 32`
   host: 'https://auth.dark-kuins.net',
   allowed_app_callback_url: %r(\Ahttps://[^/]+\.(dark-kuins\.net|nna774\.net)/),
