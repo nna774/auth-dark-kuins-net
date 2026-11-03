@@ -10,6 +10,9 @@ bundler:
 
 # 秘密は環境変数で渡す: GITHUB_KEY GITHUB_SECRET RACK_SESSION_KEY RACK_SESSION_SECRET
 deploy: app
+	@for v in GITHUB_KEY GITHUB_SECRET RACK_SESSION_KEY RACK_SESSION_SECRET; do \
+		eval "[ -n \"\$$$$v\" ]" || { echo "$$v が空。環境変数が空で上書きされるのでやめる" >&2; exit 1; }; \
+	done
 	sam deploy --region ap-northeast-1 --capabilities CAPABILITY_IAM --s3-bucket nana-lambda --stack-name auth-dark-kuins-net \
 		--parameter-overrides GithubKey="$$GITHUB_KEY" GithubSecret="$$GITHUB_SECRET" RackSessionKey="$$RACK_SESSION_KEY" RackSessionSecret="$$RACK_SESSION_SECRET"
 
