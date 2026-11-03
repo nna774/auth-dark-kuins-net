@@ -1,5 +1,18 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
+Parameters:
+  GithubKey:
+    Type: String
+    NoEcho: true
+  GithubSecret:
+    Type: String
+    NoEcho: true
+  RackSessionKey:
+    Type: String
+    NoEcho: true
+  RackSessionSecret:
+    Type: String
+    NoEcho: true
 Resources:
   ApiGateway:
     Name: auth-dark-kuins-net
@@ -13,9 +26,17 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: main.Main.handle
-      Runtime: ruby2.7
+      Runtime: ruby3.4
+      Architectures:
+        - arm64
       FunctionName: auth-dark-kuins-net
       Timeout: 30
+      Environment:
+        Variables:
+          GITHUB_KEY: !Ref GithubKey
+          GITHUB_SECRET: !Ref GithubSecret
+          RACK_SESSION_KEY: !Ref RackSessionKey
+          RACK_SESSION_SECRET: !Ref RackSessionSecret
       Events:
         Root:
           Type: HttpApi
