@@ -7,6 +7,11 @@ if ENV['RACK_ENV'] != 'development'
   use Rack::SslEnforcer
 end
 
+# nginx_omniauth_adapter は /auth/:provider へ GET でリダイレクトしてくる。
+# omniauth 2 は既定で POST だけを許すので、GET を許可する。
+OmniAuth.config.allowed_request_methods = %i(get)
+OmniAuth.config.silence_get_warning = true
+
 use Rack::Session::Cookie,
   key: ENV['RACK_SESSION_KEY'],
   secret: ENV['RACK_SESSION_SECRET'],
