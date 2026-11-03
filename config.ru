@@ -1,6 +1,5 @@
 require 'nginx_omniauth_adapter'
 require 'omniauth-github'
-require 'open-uri'
 require 'rack/ssl-enforcer'
 
 if ENV['RACK_ENV'] != 'development'
@@ -23,12 +22,13 @@ use Rack::Session::Cookie,
   expire_after: 60 * 60 * 24 * 30
 
 use OmniAuth::Builder do
-  provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], scope: 'read:org'
+  # スコープは要求しない (公開情報の uid だけ使う)。org やチームは読まない。
+  provider :github, ENV['GITHUB_KEY'], ENV['GITHUB_SECRET'], scope: ''
 end
 
-GH_TEAMS = %w(
-  dark-kuins-net/all
-)
+# 許可する GitHub のユーザー ID (数値。ログイン名は変更されて他人に渡りうるので使わない)。
+# 691828: nna774
+GH_UIDS = %w(691828)
 
 app = NginxOmniauthAdapter.app(
   providers: %i(github),
@@ -39,16 +39,10 @@ app = NginxOmniauthAdapter.app(
   app_refresh_interval: 60 * 60 * 24 * 2,
   adapter_refresh_interval: 60 * 60 * 24 * 7,
   policy_proc: proc {
-    (current_user_data[:gh_teams] || []).any? { |team| GH_TEAMS.include?(team) }
+    GH_UIDS.include?(current_user_data[:gh_uid])
   },
   on_login_proc: proc {
-    auth = env['omniauth.auth']
-    if GH_TEAMS
-      api_host = 'https://api.github.com'
-      current_user_data[:gh_teams] = URI.open("#{api_host}/user/teams", 'Authorization' => "token #{auth['credentials']['token']}") { |io|
-        JSON.parse(io.read).map {|_| "#{_['organization']['login']}/#{_['slug']}" }.select { |team| GH_TEAMS.include?(team) }
-      }
-    end
+    current_user_data[:gh_uid] = env['omniauth.auth']['uid'].to_s
     true
   },
 )
