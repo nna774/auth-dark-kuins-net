@@ -1,4 +1,4 @@
-.PHONY: deploy preview bundler
+.PHONY: deploy preview bundler dualstack
 all: app
 
 app: bundler
@@ -18,6 +18,18 @@ deploy: app
 	done; \
 	if [ $$# -gt 0 ]; then set -- --parameter-overrides "$$@"; fi; \
 	sam deploy --region ap-northeast-1 --capabilities CAPABILITY_IAM --s3-bucket nana-lambda --stack-name auth-dark-kuins-net "$$@"
+	$(MAKE) dualstack
+
+# SAM は HttpApi の Domain で IpAddressType を渡せない (SAM CLI 1.171 / SAM 1.116 時点。対応済みなのは REST API と WebSocketApi だけ) ので、deploy の後に直接 dualstack にする。
+# SAM が HttpApi の Domain に対応したら、この target を消してテンプレートに書く。
+# v4 だと、EC2 (tsugu) の nginx から Lambda へ、一度家を経由して AWS に戻ってしまう。
+# 同じ値の update は何度流しても安全。CloudFormation がドメインを更新して設定が戻っても、次の deploy で直る。
+# 証明書などは今の値を読み直して引き継ぐ。aws cli は IpAddressType に対応した新しいもの (2.39 以降) が要る。
+dualstack:
+	@aws apigatewayv2 get-domain-name --region ap-northeast-1 --domain-name auth.dark-kuins.net --query 'DomainNameConfigurations[0]' --output json \
+	| jq -r '"CertificateArn=\(.CertificateArn),EndpointType=\(.EndpointType),SecurityPolicy=\(.SecurityPolicy),IpAddressType=dualstack"' \
+	| xargs -I{} aws apigatewayv2 update-domain-name --region ap-northeast-1 --domain-name auth.dark-kuins.net --domain-name-configurations {} \
+		--query 'DomainNameConfigurations[0].{ipAddressType:IpAddressType,status:DomainNameStatus}'
 
 preview: app
 	sam local start-api
