@@ -6,7 +6,7 @@ app: bundler
 bundler:
 	rm -rf vendor/bundle .bundle
 	docker run --rm --platform linux/arm64 --entrypoint /bin/sh -v "$(CURDIR)":/var/task -w /var/task public.ecr.aws/lambda/ruby:3.4 \
-		-c 'microdnf install -y gcc make >/dev/null && bundle config set --local path vendor/bundle && bundle config set --local deployment true && bundle install'
+		-c 'microdnf install -y gcc make >/dev/null && bundle config set --local path vendor/bundle && bundle config set --local deployment true && bundle config set --local without test && bundle install'
 
 # 秘密は変える時だけ環境変数で渡す: GITHUB_KEY GITHUB_SECRET RACK_SESSION_KEY RACK_SESSION_SECRET
 # 渡さなかったものは、SAM がスタックの前回の値を引き継ぐ (空の値で上書きはしない)。

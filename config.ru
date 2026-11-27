@@ -10,6 +10,8 @@ end
 # omniauth 2 は既定で POST だけを許すので、GET を許可する。
 OmniAuth.config.allowed_request_methods = %i(get)
 OmniAuth.config.silence_get_warning = true
+# 既定では callback の URL を Host ヘッダから組むので、偽の Host で別のホストに向けられないよう固定する。
+OmniAuth.config.full_host = 'https://auth.dark-kuins.net'
 
 # RACK_SESSION_KEY は cookie の名前になる。rack は cookie 名をエスケープして返すのに、
 # 読み戻す時は名前をアンエスケープしないので、+ / = などを含むとセッションが読めなくなる。
@@ -47,9 +49,27 @@ app = NginxOmniauthAdapter.app(
   },
 )
 
+# 復元されたタブなどで古い callback の URL が読み直されると、state が合わず csrf_detected になる。
+# 戻り先がセッションに残っていれば、認証を最初からやり直させる。ループしないよう 1 分に 1 回まで。
+CSRF_RETRY_INTERVAL = 60
+
+retry_csrf = ->(env) {
+  req = Rack::Request.new(env)
+  return unless req.path_info == '/auth/failure' && req.params['message'] == 'csrf_detected'
+
+  session = env['rack.session']
+  return unless session['back_to'] && session['app_callback']
+  return if session['csrf_retried_at'] && Time.now.to_i - session['csrf_retried_at'] < CSRF_RETRY_INTERVAL
+
+  session['csrf_retried_at'] = Time.now.to_i
+  [302, {'Location' => 'https://auth.dark-kuins.net/auth/github'}, []]
+}
+
 run ->(env) {
   if env['PATH_INFO'] == '/'
     [200, {}, ['o-su!']]
+  elsif (res = retry_csrf.(env))
+    res
   else
     app.call(env)
   end
