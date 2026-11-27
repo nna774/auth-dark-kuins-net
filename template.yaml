@@ -33,6 +33,8 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
+          # 未設定だと Sinatra が development で動き、例外のページにスタックトレースとリクエストの env を出す。
+          RACK_ENV: production
           GITHUB_KEY: !Ref GithubKey
           GITHUB_SECRET: !Ref GithubSecret
           RACK_SESSION_KEY: !Ref RackSessionKey
