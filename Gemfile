@@ -14,3 +14,9 @@ gem 'omniauth-github'
 group 'apigateway' do
   gem 'apigatewayv2_rack'
 end
+
+group 'test' do
+  gem 'minitest'
+  gem 'rack-test'
+  gem 'rake'
+end
